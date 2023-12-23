@@ -1,0 +1,17 @@
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\hackseso.exe
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\hackseso.deps.json
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\hackseso.runtimeconfig.json
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\hackseso.dll
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\hackseso.pdb
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\bin\Debug\net8.0\swed64.dll
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.csproj.AssemblyReference.cache
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.AssemblyInfoInputs.cache
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.AssemblyInfo.cs
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.csproj.CoreCompileInputs.cache
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.csproj.CopyComplete
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.dll
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\refint\hackseso.dll
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.pdb
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\hackseso.genruntimeconfig.cache
+C:\Users\vilte\OneDrive\Escritorio\Repo\hackseso\hackseso\obj\Debug\net8.0\ref\hackseso.dll
