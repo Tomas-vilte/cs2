@@ -40,6 +40,26 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "ClickableTransparentOverlay": {
+              "target": "Package",
+              "version": "[6.2.1, )"
+            },
+            "ImGui.NET": {
+              "target": "Package",
+              "version": "[1.89.7.1, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.0.2, )"
+            },
+            "Veldrid.ImGui": {
+              "target": "Package",
+              "version": "[5.72.0, )"
+            },
+            "Vortice.Mathematics": {
+              "target": "Package",
+              "version": "[1.6.2, )"
+            },
             "swed64": {
               "target": "Package",
               "version": "[1.0.5, )"
