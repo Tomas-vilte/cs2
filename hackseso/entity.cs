@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Counter_Strike_2_Multi
 {
     public class Entity
-    {
+    {   
         public IntPtr address { get; set; }
 
         public int health { get; set; }

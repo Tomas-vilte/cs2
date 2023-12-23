@@ -1,61 +1,63 @@
 ﻿using Swed64;
-using System.Formats.Asn1;
 using System.Runtime.InteropServices;
 
-// Inicializa la clase swed
-Swed swed = new Swed("cs2");
 
-// Creamos las constantes, donde esta los valores del espacio
-const int SPACE_BAR = 0x20;
-
-// Agachado y salto
-const uint STANDING = 65665;
-const uint CROUCHING = 65667;
-
-// +jump y -jump
-const uint PLUS_JUMP = 65537; // +jump
-const uint MINUS_JUMP = 256; // -jump
-
-// modulo "client.dll"
-IntPtr client = swed.GetModuleBase("client.dll");
-
-// Calcula la dirección de memoria para el valor "forceJump"
-IntPtr forceJumpAddress = client + 0x16C2380;
-
-// Bucle infinito para controlar el salto
-while (true)
+// Creamos una clase llamada JumpController para encapsular la lógica de control de salto
+public class JumpController
 {
-    // Obtiene la dirección de memoria del jugador
-    IntPtr playerPawnAddress = swed.ReadPointer(client, 0x16C8F38);
+    private readonly Swed _swed;
+    private readonly IntPtr _client;
+    private readonly IntPtr _forceJumpAddress;
 
-    // Obtiene el estado actual del jugador
-    uint fFlag = swed.ReadUInt(playerPawnAddress, 0x3C8);
+    // Definimos constantes para las teclas y estados
+    private const int SPACE_BAR = 0x20;
+    private const uint STANDING = 65665;
+    private const uint CROUCHING = 65667;
+    private const uint PLUS_JUMP = 65537; // +jump
+    private const uint MINUS_JUMP = 256; // -jump
 
-    // Si la tecla espacio está presionada
-    if (GetAsyncKeyState(SPACE_BAR) < 0)
+    // Importamos la función GetAsyncKeyState del API de Windows para comprobar el estado de las teclas
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int vKey);
+
+    // Constructor de la clase JumpController
+    public JumpController()
     {
-        // Si el jugador está parado o agachado
-        if (fFlag == STANDING || fFlag == CROUCHING)
-        {
-            // Pausa el hilo durante 1 milisegundo
-            Thread.Sleep(1);
+        _swed = new Swed("cs2");
+        _client = _swed.GetModuleBase("client.dll");
+        _forceJumpAddress = _client + 0x16C2380;
 
-            // Escribe el valor "PLUS_JUMP" en la memoria
-            swed.WriteUInt(forceJumpAddress, PLUS_JUMP);
-        }
-        // Si el jugador está en el aire
-        else
-        {
-            // Escribe el valor "MINUS_JUMP" en la memoria
-            swed.WriteUInt(forceJumpAddress, MINUS_JUMP);
-        }
     }
 
-    // Pausa el hilo durante 5 milisegundos
-    Thread.Sleep(5);
+    // Método para iniciar el control de salto
+    public void StartJumpControl()
+    {
+        // Bucle infinito para controlar el salto
+        while (true)
+        {
+            // Obtiene la dirección de memoria del jugador
+            IntPtr playerPawnAddress = _swed.ReadPointer(_client, 0x16C8F38);
+            uint fFlag = _swed.ReadUInt(playerPawnAddress, 0x3C8);
+
+            // Si la tecla espacio está presionada
+            if (GetAsyncKeyState(SPACE_BAR) < 0)
+            {
+                // Si el jugador está parado o agachado
+                if (fFlag == STANDING || fFlag == CROUCHING)
+                {
+                    Thread.Sleep(1);
+                    // Escribe el valor PLUS_JUMP en la memoria
+                    _swed.WriteUInt(_forceJumpAddress, PLUS_JUMP);
+                }
+                // Si el jugador está en el aire
+                else
+                {
+                    // Escribe el valor MINUS_JUMP en la memoria
+                    _swed.WriteUInt(_forceJumpAddress, MINUS_JUMP);
+                }
+            }
+            // Pausamos el hilo 5s
+            Thread.Sleep(5);
+        }
+    }
 }
-
-// Importa la función "GetAsyncKeyState" del API de Windows para comprobar el estado de las teclas
-[DllImport("user32.dll")]
-
-static extern short GetAsyncKeyState(int vKey);
