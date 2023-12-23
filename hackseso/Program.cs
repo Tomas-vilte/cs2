@@ -1,5 +1,6 @@
 using ClickableTransparentOverlay;
 using Counter_Strike_2_Multi;
+using ImGuiNET;
 using Swed64;
 
 namespace CS2MULTI
@@ -13,10 +14,12 @@ namespace CS2MULTI
         List<Entity> entities = new List<Entity>();
 
         IntPtr client;
+        JumpController jumpController;
 
         protected override void Render()
         {
             // solo renderiza cosas aca
+            ImGui.Begin("counter");
         }
 
         void MainLogic()
@@ -30,8 +33,43 @@ namespace CS2MULTI
 
                 localPlayer.address = swed.ReadPointer(client, offsets.localPlayer); // establece la dirección para que pueda actualizar
                 UpdateEntity(localPlayer);
+                UpdateEntities();
 
-                Console.WriteLine($"health -> {localPlayer.health}");
+                //int o = 0;
+                //Console.WriteLine(o);
+                //Console.WriteLine($"health -> {localPlayer.health}");
+
+                foreach (var entity in entities)
+                {
+                    Console.WriteLine($"Entity health -> {entity.health} entity position: {entity.origin}");
+                }
+                Thread.Sleep(100);
+                Console.Clear();
+            }
+        }
+
+        void UpdateEntities()
+        {
+            for (int i = 0; i < 64; i++)
+            {
+                IntPtr tempEntityAddress = swed.ReadPointer(client, offsets.entityList + i * 0x08);
+
+                if (tempEntityAddress == IntPtr.Zero)
+                    continue;
+
+                Entity entity = new Entity();
+                entity.address = tempEntityAddress;
+
+                UpdateEntity(entity);
+
+                if (entity.health < 1 || entity.health > 100)
+                    continue;
+
+                if (!entities.Any(element => element.origin.X == entity.origin.X))
+                {
+                    entities.Add(entity);
+                }
+
             }
         }
 
@@ -48,6 +86,9 @@ namespace CS2MULTI
 
             Thread mainLogicThread = new Thread(program.MainLogic) { IsBackground = true };
             mainLogicThread.Start();
+
+            program.jumpController = new JumpController();
+            program.jumpController.StartJumpControl();
         }
 
 

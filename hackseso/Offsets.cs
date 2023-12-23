@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 
 namespace Counter_Strike_2_Multi
 {
@@ -6,11 +5,11 @@ namespace Counter_Strike_2_Multi
     {
 
         // Bases
-        public int localPlayer = 0X16D5C60;
-        public int entityList = 0X16C8F38;
+        public int localPlayer = 0x16C8F38;
+        public int entityList = 0x16D5C60;
 
         // Atributos
         public int health = 0x32C;
-        public int origin = 0XCD8;
+        public int origin = 0xCD8;
     }
 }

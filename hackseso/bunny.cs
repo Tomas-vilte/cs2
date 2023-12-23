@@ -29,7 +29,7 @@ public class JumpController
 
     }
 
-    // Método para iniciar el control de salto
+    // Metodo para iniciar el control de salto
     public void StartJumpControl()
     {
         // Bucle infinito para controlar el salto
