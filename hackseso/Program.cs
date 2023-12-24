@@ -74,6 +74,8 @@ namespace CS2MULTI
             // solo renderiza cosas aca
             DrawMenu();
             DrawOverlay();
+            Esp();
+            ImGui.End();
         }
 
         ViewMatrix ReadMatrix(IntPtr matrixAddress)
@@ -119,8 +121,8 @@ namespace CS2MULTI
                 float camX = width / 2;
                 float camY = height / 2;
 
-                float X = camX * (camX * screenX / screenW);
-                float Y = camY * (camY * screenY / screenW);
+                float X = camX + (camX * screenX / screenW);
+                float Y = camY - (camY * screenY / screenW);
 
                 screenCoordinates.X = X;
                 screenCoordinates.Y = Y;
@@ -133,9 +135,36 @@ namespace CS2MULTI
             }
         }
 
+        void Esp()
+        {
+            drawList = ImGui.GetWindowDrawList();
+
+            if (enableEsp)
+            {
+                try
+                {
+                    foreach(var entity in entities)
+                    {
+                        if (entity.teamNum == localPlayer.teamNum)
+                        {
+                            DrawVisuals(entity, teamColor, enableTeamLine, enableTeamBox, enableTeamDot, enableTeamHealthBar, enableTeamDistance);
+                        }
+                        else
+                        {
+                            DrawVisuals(entity, enemyColor, enableEnemyLine, enableEnemyBox, enableEnemyDot, enableEnemyHealthBar, enableEnemyDistance);
+                        }
+                    }
+
+                } catch
+                {
+
+                }
+            }
+        }
+
         void DrawMenu()
         {
-            ImGui.Begin("counter");
+            ImGui.Begin("counter strike seso");
 
             if (ImGui.BeginTabBar("Tabs"))
             {
@@ -169,7 +198,7 @@ namespace CS2MULTI
         void DrawOverlay()
         {
             ImGui.SetNextWindowSize(windowSize);
-            ImGui.SetWindowPos(windowLocation);
+            ImGui.SetNextWindowPos(windowLocation);
             ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoBackground
                 | ImGuiWindowFlags.NoBringToFrontOnFocus
@@ -189,12 +218,12 @@ namespace CS2MULTI
                 uint uintHealthTextColor = ImGui.ColorConvertFloat4ToU32(healthTextColor);
                 uint uintHealthBarColor = ImGui.ColorConvertFloat4ToU32(healthBarColor);
 
-                Vector2 boxWidth = new Vector2((entity.originScreenPosition.Y - entity.absScreenPosition.Y / 2), 0f);
+                Vector2 boxWidth = new Vector2((entity.originScreenPosition.Y - entity.absScreenPosition.Y) / 2, 0f);
                 Vector2 boxStart = Vector2.Subtract(entity.absScreenPosition, boxWidth);
                 Vector2 boxEnd = Vector2.Add(entity.originScreenPosition, boxWidth);
 
                 float barPercent = entity.health / 100f;
-                Vector2 barHeight = new Vector2(0, barPercent + (entity.originScreenPosition.Y - entity.absScreenPosition.Y));
+                Vector2 barHeight = new Vector2(0, barPercent * (entity.originScreenPosition.Y - entity.absScreenPosition.Y));
                 Vector2 barStart = Vector2.Subtract(Vector2.Subtract(entity.originScreenPosition, boxWidth), barHeight);
                 Vector2 barEnd = Vector2.Subtract(entity.originScreenPosition, Vector2.Add(boxWidth, new Vector2(-4, 0)));   
 
@@ -216,7 +245,7 @@ namespace CS2MULTI
                 if (healthBar)
                 {
                     drawList.AddText(entity.originScreenPosition, uintHealthTextColor, $"hp: {entity.health}");
-                    drawList.AddRectFilled(barStart, barEnd, uintHealthTextColor);
+                    drawList.AddRectFilled(barStart, barEnd, uintHealthBarColor);
                 }
 
 
@@ -225,7 +254,7 @@ namespace CS2MULTI
 
         bool IsPixelInsideScreen(Vector2 pixel)
         {
-            return pixel.X > windowLocation.X && pixel.X < windowSize.X + windowSize.X && pixel.Y > windowLocation.Y && pixel.Y < windowSize.Y + windowLocation.Y;
+            return pixel.X > windowLocation.X && pixel.X < windowLocation.X + windowSize.X && pixel.Y > windowLocation.Y && pixel.Y < windowSize.Y + windowLocation.Y;
         }
 
         void MainLogic()
@@ -235,7 +264,7 @@ namespace CS2MULTI
             var window = GetWindowRect(swed.GetProcess().MainWindowHandle);
             windowLocation = new Vector2(window.left, window.top);
             windowSize = Vector2.Subtract(new Vector2(window.right, window.bottom), windowLocation);
-            lineOrigin = new Vector2(windowLocation.X + windowLocation.X/2, window.bottom);
+            lineOrigin = new Vector2(windowLocation.X + windowSize.X/2, window.bottom);
             windowsCenter = new Vector2(lineOrigin.X, window.bottom - windowSize.Y/2);
 
             while (true) // Siempre corre 
@@ -256,6 +285,8 @@ namespace CS2MULTI
         void ReloadEntities()
         {
             entities.Clear(); // client lists
+            playerTeam.Clear();
+            enemyTeam.Clear();
 
             localPlayer.address = swed.ReadPointer(client, offsets.localPlayer); // establece la dirección para que pueda actualizar
             UpdateEntity(localPlayer);
@@ -300,15 +331,18 @@ namespace CS2MULTI
         {
             entity.health = swed.ReadInt(entity.address, offsets.health);
             entity.origin = swed.ReadVec(entity.address, offsets.origin);
-            entity.teamNum = swed.ReadInt(entity.address, offsets.teamNum);        
-            
+            entity.teamNum = swed.ReadInt(entity.address, offsets.teamNum);
+
+            entity.origin = swed.ReadVec(entity.address, offsets.origin);
+            entity.viewOffset = new Vector3(0, 0, 65);
+
+            entity.abs = Vector3.Add(entity.origin, entity.viewOffset);
 
             var currentViewMatrix = ReadMatrix(client + offsets.viewmatrix);
-            entity.originScreenPosition = Vector2.Add(WorldToScreen(currentViewMatrix, entity.origin,(int)(windowSize.X), (int)windowSize.Y), windowLocation);
+            entity.originScreenPosition = Vector2.Add(WorldToScreen(currentViewMatrix, entity.origin, (int)windowSize.X, (int)windowSize.Y), windowLocation);
             entity.absScreenPosition = Vector2.Add(WorldToScreen(currentViewMatrix, entity.abs, (int)windowSize.X, (int)windowSize.Y), windowLocation);
 
-            entity.viewOffset = new Vector3(0, 0, 65);
-            entity.abs = Vector3.Add(entity.origin, entity.viewOffset);
+          
         }
 
         static void Main(string[] args)

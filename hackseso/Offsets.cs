@@ -9,7 +9,7 @@ namespace Counter_Strike_2_Multi
         // Bases
         public int localPlayer = 0x16C8F38;
         public int entityList = 0x16D5C60;
-        public int viewmatrix = 0x1820830;
+        public int viewmatrix = 0x1820150;
 
         // Atributos
         public int teamNum = 0x3bf;
