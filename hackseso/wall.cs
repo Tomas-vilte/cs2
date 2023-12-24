@@ -23,5 +23,39 @@ while (true)
     entities.Clear();
     Console.Clear();
 
-    IntPtr entityList = swed.ReadPointer(client, 0x0);
+    // obtenemos la lista de entidades
+    IntPtr entityList = swed.ReadPointer(client, Player.dwEntityList);
+
+    // primera entida
+    IntPtr listEntry = swed.ReadPointer(client, 0x10);
+
+    localPlayer.pawnAddress = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
+    localPlayer.team = swed.ReadInt(localPlayer.pawnAddress, Player.m_iTeamNum);
+    localPlayer.origin = swed.ReadVec(localPlayer.pawnAddress, Player.m_vOldOrigin);
+
+    for (int i = 0; i < 64;  i++)
+    {
+        if (listEntry == IntPtr.Zero)
+            continue;
+
+        IntPtr currentController = swed.ReadPointer(listEntry, i * 0x78);
+
+        if (currentController == IntPtr.Zero)
+            continue;
+
+        int pawnHandle = swed.ReadInt(currentController, Player.m_hPlayerPawn);
+
+        if (pawnHandle == 0)
+            continue;
+
+        IntPtr listEntry2 = swed.ReadPointer(entityList, 0x8 * ((pawnHandle & 0x7FFF) >> 9) + 0x10);
+
+        IntPtr currenPawn = swed.ReadPointer(listEntry2, 0x78 * (pawnHandle & 0x1FF));
+
+        if (currenPawn == localPlayer.pawnAddress)
+            continue;
+
+        IntPtr sceneMode = swed.ReadPointer(currenPawn, Player.m_pGameSceneNode);
+        IntPtr boneMatrix = swed.ReadPointer(sceneMode, Player.m_modelState + 0x80);
+    }
 }
