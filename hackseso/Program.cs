@@ -2,6 +2,7 @@ using ClickableTransparentOverlay;
 using Counter_Strike_2_Multi;
 using ImGuiNET;
 using Swed64;
+using System.Numerics;
 
 namespace CS2MULTI
 {
@@ -12,8 +13,21 @@ namespace CS2MULTI
 
         Entity localPlayer = new Entity();
         List<Entity> entities = new List<Entity>();
+        List<Entity> enemyTeam = new List<Entity>();
+        List<Entity> playerTeam = new List<Entity>();
 
         IntPtr client;
+
+        // global colors
+        Vector4 teamColor = new Vector4(0,0,0,1); // color azul los compa
+        Vector4 enemyColor = new Vector4(1,0,0,1); // color rojo los enemigos
+        Vector4 healthBarColor = new Vector4 (0,1,0,1); // verde la vida
+        Vector4 healthTextColor = new Vector4(0, 0, 0, 1); // negro el texto
+
+        Vector2 windowLocation = new Vector2 (0,0);
+        Vector2 windowSize = new Vector2 (1920, 1080);
+        Vector2 lineOrigin = new Vector2(1920 / 2, 1080);
+
         JumpController jumpController;
 
         protected override void Render()
@@ -29,25 +43,25 @@ namespace CS2MULTI
 
             while (true) // Siempre corre 
             {
-                entities.Clear(); // client lists
 
-                localPlayer.address = swed.ReadPointer(client, offsets.localPlayer); // establece la dirección para que pueda actualizar
-                UpdateEntity(localPlayer);
-                UpdateEntities();
-
-                //int o = 0;
-                //Console.WriteLine(o);
-                //Console.WriteLine($"health -> {localPlayer.health}");
-
-                foreach (var entity in entities)
-                {
-                    Console.WriteLine($"Entity health -> {entity.health} entity position: {entity.origin}");
-                }
-                Thread.Sleep(100);
-                Console.Clear();
+                //foreach (var entity in entities)
+                //{
+                //    Console.WriteLine($"Entity health -> {entity.health} entity position: {entity.origin}");
+                //}
+                //Thread.Sleep(100);
+                //Console.Clear();
             }
         }
 
+        void ReloadEntities()
+        {
+            entities.Clear(); // client lists
+
+            localPlayer.address = swed.ReadPointer(client, offsets.localPlayer); // establece la dirección para que pueda actualizar
+            UpdateEntity(localPlayer);
+
+            UpdateEntities();
+        }
         void UpdateEntities()
         {
             for (int i = 0; i < 64; i++)
