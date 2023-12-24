@@ -16,7 +16,10 @@ namespace CS2MULTI
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
         {
-
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
         }
 
         public RECT GetWindowRect(IntPtr hWnd)
@@ -29,6 +32,7 @@ namespace CS2MULTI
 
         Swed swed = new Swed("cs2");
         Offsets offsets = new Offsets();
+        ImDrawListPtr drawList;
 
         Entity localPlayer = new Entity();
         List<Entity> entities = new List<Entity>();
@@ -43,7 +47,7 @@ namespace CS2MULTI
         Vector4 healthBarColor = new Vector4 (0,1,0,1); // verde la vida
         Vector4 healthTextColor = new Vector4(0, 0, 0, 1); // negro el texto
 
-        Vector2 windowLocation = new Vector2 (0,0);
+        Vector2 windowLocation = new Vector2(0,0);
         Vector2 windowSize = new Vector2 (1920, 1080);
         Vector2 lineOrigin = new Vector2(1920 / 2, 1080);
         Vector2 windowsCenter = new Vector2(1920 / 2, 1080 / 2);
@@ -74,10 +78,18 @@ namespace CS2MULTI
         {
             client = swed.GetModuleBase("client.dll");
 
+            var window = GetWindowRect(swed.GetProcess().MainWindowHandle);
+            windowLocation = new Vector2(window.left, window.top);
+            windowSize = Vector2.Subtract(new Vector2(window.right, window.bottom), windowLocation);
+            lineOrigin = new Vector2(windowLocation.X + windowLocation.X/2, window.bottom);
+            windowsCenter = new Vector2(lineOrigin.X, window.bottom - windowSize.Y/2);
 
             while (true) // Siempre corre 
             {
 
+                ReloadEntities();
+
+                Thread.Sleep(3);
                 //foreach (var entity in entities)
                 //{
                 //    Console.WriteLine($"Entity health -> {entity.health} entity position: {entity.origin}");
@@ -116,6 +128,15 @@ namespace CS2MULTI
                 if (!entities.Any(element => element.origin.X == entity.origin.X))
                 {
                     entities.Add(entity);
+
+                    if (entity.teamNum == localPlayer.teamNum)
+                    {
+                        playerTeam.Add(entity);
+                    }
+                    else
+                    {
+                        enemyTeam.Add(entity);
+                    }
                 }
 
             }
@@ -125,6 +146,7 @@ namespace CS2MULTI
         {
             entity.health = swed.ReadInt(entity.address, offsets.health);
             entity.origin = swed.ReadVec(entity.address, offsets.origin);
+            entity.teamNum = swed.ReadInt(entity.address, offsets.teamNum);
         }
 
         static void Main(string[] args)
