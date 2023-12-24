@@ -44,3 +44,20 @@ namespace Counter_Strike_2_Multi
 
     }
 }
+
+public enum BoneIds
+{
+    Waist = 0, // 0
+    Neck = 5, // 1
+    Head = 6, // 2
+    ShoulderLeft = 8, // 3
+    ForeLeft = 9, // 4
+    HandLeft = 11, // 5
+    ShoulderRight = 13, // 6
+    ForeRight = 14, // 7
+    HandRight = 16, // 8
+    KneeLeft = 23, // 9
+    FeetLeft = 24, // 10
+    KneeRight = 26, // 11
+    FeetRight = 27 // 12
+}
