@@ -27,5 +27,20 @@ namespace Counter_Strike_2_Multi
         public Vector2 originScreenPosition { get; set; }
 
         public Vector2 absScreenPosition { get; set; }
+
+        public IntPtr pawnAddress { get; set; }
+
+        public IntPtr controllerAddress { get; set; }
+
+        public int team {  get; set; }
+
+        public uint lifeState { get; set; }
+
+        public float distance {  get; set; }
+
+        public List<Vector3> bones { get; set; }
+
+        public List<Vector2> bones2d { get; set; }
+
     }
 }

@@ -1,6 +1,4 @@
 
-using System.Security.Cryptography.X509Certificates;
-
 namespace Counter_Strike_2_Multi
 {
     public class Offsets
@@ -9,7 +7,7 @@ namespace Counter_Strike_2_Multi
         // Bases
         public int localPlayer = 0x16C8F38;
         public int entityList = 0x16D5C60;
-        public int viewmatrix = 0x1820150;
+        public int viewmatrix = 0x1820150; //0x1820830
 
         // Atributos
         public int teamNum = 0x3bf;
