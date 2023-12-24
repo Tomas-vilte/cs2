@@ -22,6 +22,8 @@ namespace Counter_Strike_2_Multi
 
         public Vector3 abs {  get; set; }
 
+        public Vector3 viewOffset { get; set; }
+
         public Vector2 originScreenPosition { get; set; }
 
         public Vector2 absScreenPosition { get; set; }
