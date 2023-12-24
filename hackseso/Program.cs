@@ -72,6 +72,7 @@ namespace CS2MULTI
         {
             // solo renderiza cosas aca
             DrawMenu();
+            DrawOverlay();
         }
 
         void DrawMenu()
@@ -105,6 +106,21 @@ namespace CS2MULTI
                 }
             }
             ImGui.EndTabBar();
+        }
+
+        void DrawOverlay()
+        {
+            ImGui.SetNextWindowSize(windowSize);
+            ImGui.SetWindowPos(windowLocation);
+            ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoBringToFrontOnFocus
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoInputs
+                | ImGuiWindowFlags.NoCollapse
+                | ImGuiWindowFlags.NoScrollbar
+                | ImGuiWindowFlags.NoScrollWithMouse
+                );
         }
 
         void MainLogic()
