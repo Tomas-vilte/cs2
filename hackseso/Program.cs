@@ -2,12 +2,31 @@ using ClickableTransparentOverlay;
 using Counter_Strike_2_Multi;
 using ImGuiNET;
 using Swed64;
+using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace CS2MULTI
 {
     class Program : Overlay
     {
+        [DllImport("user32.dll")]   
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+
+        }
+
+        public RECT GetWindowRect(IntPtr hWnd)
+        {
+            RECT rect = new RECT();
+            GetWindowRect(hWnd, out rect);
+            return rect;
+        }
+        
+
         Swed swed = new Swed("cs2");
         Offsets offsets = new Offsets();
 
@@ -27,6 +46,21 @@ namespace CS2MULTI
         Vector2 windowLocation = new Vector2 (0,0);
         Vector2 windowSize = new Vector2 (1920, 1080);
         Vector2 lineOrigin = new Vector2(1920 / 2, 1080);
+        Vector2 windowsCenter = new Vector2(1920 / 2, 1080 / 2);
+
+        bool enableEsp = true;
+
+        bool enableTeamLine = true;
+        bool enableTeamBox = true;
+        bool enableTeamDot = false;
+        bool enableTeamHealthBar = true;
+        bool enableTeamDistance = true;
+
+        bool enableEnemyLine = true;
+        bool enableEnemyBox = true;
+        bool enableEnemyDot = false;
+        bool enableEnemyHealthBar = true;
+        bool enableEnemyDistance = true;
 
         JumpController jumpController;
 
