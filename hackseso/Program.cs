@@ -71,7 +71,40 @@ namespace CS2MULTI
         protected override void Render()
         {
             // solo renderiza cosas aca
+            DrawMenu();
+        }
+
+        void DrawMenu()
+        {
             ImGui.Begin("counter");
+
+            if (ImGui.BeginTabBar("Tabs"))
+            {
+                if (ImGui.BeginTabItem("General"))
+                {
+                    ImGui.Checkbox("Esp", ref enableEsp);
+                    ImGui.EndTabItem();
+                }
+                if (ImGui.BeginTabItem("colors"))
+                {   
+
+                    // Color del team
+                    ImGui.ColorPicker4("Team color", ref teamColor);
+                    ImGui.Checkbox("Team line", ref enableTeamLine);
+                    ImGui.Checkbox("Team box", ref enableTeamBox);
+                    ImGui.Checkbox("Team dot", ref enableTeamDot);
+                    ImGui.Checkbox("Team HealthBar", ref enableTeamHealthBar);
+
+                    // Color del team contrario
+                    ImGui.ColorPicker4("Enemy color", ref enemyColor);
+                    ImGui.Checkbox("Enemy line", ref enableEnemyLine);
+                    ImGui.Checkbox("Enemy box", ref enableEnemyBox);
+                    ImGui.Checkbox("Enemy dot", ref enableEnemyDot);
+                    ImGui.Checkbox("Enemy HealthBar", ref enableEnemyHealthBar);
+                    ImGui.EndTabItem();
+                }
+            }
+            ImGui.EndTabBar();
         }
 
         void MainLogic()
