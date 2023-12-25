@@ -1,362 +1,96 @@
-using ClickableTransparentOverlay;
-using Counter_Strike_2_Multi;
 using hackseso;
-using ImGuiNET;
 using Swed64;
-using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
-namespace CS2MULTI
+Swed swed = new Swed("cs2");
+
+IntPtr client = swed.GetModuleBase("client.dll");
+
+Reader reader = new Reader(swed);
+
+Renderer renderer = new Renderer();
+renderer.Start().Wait();
+
+// entity
+List<Entity> entities = new List<Entity>();
+Entity localPlayer = new Entity();
+Vector2 screen = new Vector2(1920, 1080);
+
+renderer.overlaySize = screen;
+
+while (true)
 {
-    class Program : Overlay
-    {
-        [DllImport("user32.dll")]
-        static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+        // Eliminar entidades viejas y consola
+        entities.Clear();
+        Console.Clear();
+        // obtenemos la lista de entidades
+        IntPtr entityList = swed.ReadPointer(client, Player.dwEntityList);
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
+        // primera entida
+        IntPtr listEntry = swed.ReadPointer(entityList, 0x10);
+
+        localPlayer.pawnAddress = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
+        localPlayer.team = swed.ReadInt(localPlayer.pawnAddress, Player.m_iTeamNum);
+        localPlayer.origin = swed.ReadVec(localPlayer.pawnAddress, Player.m_vOldOrigin);
+
+        for (int i = 0; i < 64; i++)
         {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
+            if (listEntry == IntPtr.Zero)
+                continue;
 
-        public RECT GetWindowRect(IntPtr hWnd)
-        {
-            RECT rect = new RECT();
-            GetWindowRect(hWnd, out rect);
-            return rect;
-        }
+            IntPtr currentController = swed.ReadPointer(listEntry, i * 0x78);
+
+            if (currentController == IntPtr.Zero)
+                continue;
+
+            int pawnHandle = swed.ReadInt(currentController, Player.m_hPlayerPawn);
+
+            if (pawnHandle == 0)
+                continue;
+
+            IntPtr listEntry2 = swed.ReadPointer(entityList, 0x8 * ((pawnHandle & 0x7FFF) >> 9) + 0x10);
+
+            IntPtr currenPawn = swed.ReadPointer(listEntry2, 0x78 * (pawnHandle & 0x1FF));
+
+            if (currenPawn == localPlayer.pawnAddress)
+                continue;
+
+            IntPtr sceneMode = swed.ReadPointer(currenPawn, Player.m_pGameSceneNode);
+            IntPtr boneMatrix = swed.ReadPointer(sceneMode, Player.m_modelState + 0x80);
+
+            ViewMatrix viewMatrix = reader.readMatrix(client + Player.dwViewMatrix);
+            Console.WriteLine(viewMatrix);
+
+            int team = swed.ReadInt(currenPawn, Player.m_iTeamNum);
+            uint lifeState = swed.ReadUInt(currenPawn, Player.m_lifeState);
+
+            if (lifeState != 256)
+                continue;
+
+            Entity entity = new Entity();
 
 
-        Swed swed = new Swed("cs2");
-        Offsets offsets = new Offsets();
-        ImDrawListPtr drawList;
+            entity.pawnAddress = currenPawn;
+            entity.controllerAddress = currentController;
+            entity.team = team;
+            entity.lifeState = lifeState;
+            entity.origin = swed.ReadVec(currenPawn, Player.m_vOldOrigin);
+            entity.distance = Vector3.Distance(entity.origin, localPlayer.origin);
+            entity.bones = reader.ReadBones(boneMatrix);
+            entity.bones2d = reader.ReadBones2d(entity.bones, viewMatrix, screen);
 
-        Entity localPlayer = new Entity();
-        List<Entity> entities = new List<Entity>();
-        List<Entity> enemyTeam = new List<Entity>();
-        List<Entity> playerTeam = new List<Entity>();
+            entities.Add(entity);
 
-        IntPtr client;
+            Console.ForegroundColor = ConsoleColor.Green;
 
-        // global colors
-        Vector4 teamColor = new Vector4(0, 0, 0, 1); // color azul los compa
-        Vector4 enemyColor = new Vector4(1, 0, 0, 1); // color rojo los enemigos
-        Vector4 healthBarColor = new Vector4(0, 1, 0, 1); // verde la vida
-        Vector4 healthTextColor = new Vector4(0, 0, 0, 1); // negro el texto
-
-        Vector2 windowLocation = new Vector2(0, 0);
-        Vector2 windowSize = new Vector2(1920, 1080);
-        Vector2 lineOrigin = new Vector2(1920 / 2, 1080);
-        Vector2 windowsCenter = new Vector2(1920 / 2, 1080 / 2);
-
-        bool enableEsp = true;
-
-        bool enableTeamLine = true;
-        bool enableTeamBox = true;
-        bool enableTeamDot = false;
-        bool enableTeamHealthBar = true;
-        bool enableTeamDistance = true;
-
-        bool enableEnemyLine = true;
-        bool enableEnemyBox = true;
-        bool enableEnemyDot = false;
-        bool enableEnemyHealthBar = true;
-        bool enableEnemyDistance = true;
-
-        JumpController jumpController;
-
-        protected override void Render()
-        {
-            // solo renderiza cosas aca
-            DrawMenu();
-            DrawOverlay();
-            Esp();
-            ImGui.End();
-        }
-
-        ViewMatrix ReadMatrix(IntPtr matrixAddress)
-        {
-            var viewMatrix = new ViewMatrix();
-            var floatMatrix = swed.ReadMatrix(matrixAddress);
-
-            viewMatrix.m11 = floatMatrix[0];
-            viewMatrix.m12 = floatMatrix[1];
-            viewMatrix.m13 = floatMatrix[2];
-            viewMatrix.m14 = floatMatrix[3];
-
-            viewMatrix.m21 = floatMatrix[4];
-            viewMatrix.m22 = floatMatrix[5];
-            viewMatrix.m23 = floatMatrix[6];
-            viewMatrix.m24 = floatMatrix[7];
-
-            viewMatrix.m31 = floatMatrix[8];
-            viewMatrix.m32 = floatMatrix[9];
-            viewMatrix.m33 = floatMatrix[10];
-            viewMatrix.m34 = floatMatrix[11];
-
-            viewMatrix.m41 = floatMatrix[12];
-            viewMatrix.m42 = floatMatrix[13];
-            viewMatrix.m43 = floatMatrix[14];
-            viewMatrix.m44 = floatMatrix[15];
-
-            return viewMatrix;
-        }
-
-        Vector2 WorldToScreen(ViewMatrix matrix, Vector3 pos, int width, int height)
-        {
-            Vector2 screenCoordinates = new Vector2();
-
-            float screenW = (matrix.m41 * pos.X) + (matrix.m42 * pos.Y) + (matrix.m43 * pos.Z) + matrix.m44;
-
-            if (screenW > 0.001f)
+            if (team != localPlayer.team)
             {
-                float screenX = (matrix.m11 * pos.X) + (matrix.m12 * pos.Y) + (matrix.m13 * pos.Z) + matrix.m14;
-
-                float screenY = (matrix.m21 * pos.X) + (matrix.m22 * pos.Y) + (matrix.m23 * pos.Z) + matrix.m24;
-
-                float camX = width / 2;
-                float camY = height / 2;
-
-                float X = camX + (camX * screenX / screenW);
-                float Y = camY - (camY * screenY / screenW);
-
-                screenCoordinates.X = X;
-                screenCoordinates.Y = Y;
-
-                return screenCoordinates;
+                Console.ForegroundColor = ConsoleColor.Red;
             }
-            else
-            {
-                return new Vector2(-99, -99);
-            }
+
+            Console.ResetColor();
         }
-
-        void Esp()
-        {
-            drawList = ImGui.GetWindowDrawList();
-
-            if (enableEsp)
-            {
-                try
-                {
-                    foreach(var entity in entities)
-                    {
-                        if (entity.teamNum == localPlayer.teamNum)
-                        {
-                            DrawVisuals(entity, teamColor, enableTeamLine, enableTeamBox, enableTeamDot, enableTeamHealthBar, enableTeamDistance);
-                        }
-                        else
-                        {
-                            DrawVisuals(entity, enemyColor, enableEnemyLine, enableEnemyBox, enableEnemyDot, enableEnemyHealthBar, enableEnemyDistance);
-                        }
-                    }
-
-                } catch
-                {
-
-                }
-            }
-        }
-
-        void DrawMenu()
-        {
-            ImGui.Begin("counter strike seso");
-
-            if (ImGui.BeginTabBar("Tabs"))
-            {
-                if (ImGui.BeginTabItem("General"))
-                {
-                    ImGui.Checkbox("Esp", ref enableEsp);
-                    ImGui.EndTabItem();
-                }
-                if (ImGui.BeginTabItem("colors"))
-                {
-
-                    // Color del team
-                    ImGui.ColorPicker4("Team color", ref teamColor);
-                    ImGui.Checkbox("Team line", ref enableTeamLine);
-                    ImGui.Checkbox("Team box", ref enableTeamBox);
-                    ImGui.Checkbox("Team dot", ref enableTeamDot);
-                    ImGui.Checkbox("Team HealthBar", ref enableTeamHealthBar);
-
-                    // Color del team contrario
-                    ImGui.ColorPicker4("Enemy color", ref enemyColor);
-                    ImGui.Checkbox("Enemy line", ref enableEnemyLine);
-                    ImGui.Checkbox("Enemy box", ref enableEnemyBox);
-                    ImGui.Checkbox("Enemy dot", ref enableEnemyDot);
-                    ImGui.Checkbox("Enemy HealthBar", ref enableEnemyHealthBar);
-                    ImGui.EndTabItem();
-                }
-            }
-            ImGui.EndTabBar();
-        }
-
-        void DrawOverlay()
-        {
-            ImGui.SetNextWindowSize(windowSize);
-            ImGui.SetNextWindowPos(windowLocation);
-            ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
-                | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoBringToFrontOnFocus
-                | ImGuiWindowFlags.NoMove
-                | ImGuiWindowFlags.NoInputs
-                | ImGuiWindowFlags.NoCollapse
-                | ImGuiWindowFlags.NoScrollbar
-                | ImGuiWindowFlags.NoScrollWithMouse
-                );
-        }
-
-        void DrawVisuals(Entity entity, Vector4 color, bool line, bool box, bool dot, bool healthBar, bool distance)
-        {
-            if (IsPixelInsideScreen(entity.originScreenPosition))
-            {
-                uint uintColor = ImGui.ColorConvertFloat4ToU32(color);
-                uint uintHealthTextColor = ImGui.ColorConvertFloat4ToU32(healthTextColor);
-                uint uintHealthBarColor = ImGui.ColorConvertFloat4ToU32(healthBarColor);
-
-                Vector2 boxWidth = new Vector2((entity.originScreenPosition.Y - entity.absScreenPosition.Y) / 2, 0f);
-                Vector2 boxStart = Vector2.Subtract(entity.absScreenPosition, boxWidth);
-                Vector2 boxEnd = Vector2.Add(entity.originScreenPosition, boxWidth);
-
-                float barPercent = entity.health / 100f;
-                Vector2 barHeight = new Vector2(0, barPercent * (entity.originScreenPosition.Y - entity.absScreenPosition.Y));
-                Vector2 barStart = Vector2.Subtract(Vector2.Subtract(entity.originScreenPosition, boxWidth), barHeight);
-                Vector2 barEnd = Vector2.Subtract(entity.originScreenPosition, Vector2.Add(boxWidth, new Vector2(-4, 0)));   
-
-                if (line)
-                {
-                    drawList.AddLine(lineOrigin, entity.originScreenPosition, uintColor, 3);
-                }
-
-                if (box)
-                {
-                    drawList.AddRect(boxStart, boxEnd, uintColor, 3);
-                }
-                
-                if (dot)
-                {
-                    drawList.AddCircleFilled(entity.originScreenPosition, 5, uintColor);
-                }
-
-                if (healthBar)
-                {
-                    drawList.AddText(entity.originScreenPosition, uintHealthTextColor, $"hp: {entity.health}");
-                    drawList.AddRectFilled(barStart, barEnd, uintHealthBarColor);
-                }
-
-
-            }
-        }
-
-        bool IsPixelInsideScreen(Vector2 pixel)
-        {
-            return pixel.X > windowLocation.X && pixel.X < windowLocation.X + windowSize.X && pixel.Y > windowLocation.Y && pixel.Y < windowSize.Y + windowLocation.Y;
-        }
-
-        void MainLogic()
-        {
-            client = swed.GetModuleBase("client.dll");
-
-            var window = GetWindowRect(swed.GetProcess().MainWindowHandle);
-            windowLocation = new Vector2(window.left, window.top);
-            windowSize = Vector2.Subtract(new Vector2(window.right, window.bottom), windowLocation);
-            lineOrigin = new Vector2(windowLocation.X + windowSize.X/2, window.bottom);
-            windowsCenter = new Vector2(lineOrigin.X, window.bottom - windowSize.Y/2);
-
-            while (true) // Siempre corre 
-            {
-
-                ReloadEntities();
-
-                Thread.Sleep(3);
-                //foreach (var entity in entities)
-                //{
-                //    Console.WriteLine($"Entity health -> {entity.health} entity position: {entity.origin}");
-                //}
-                //Thread.Sleep(100);
-                //Console.Clear();
-            }
-        }
-
-        void ReloadEntities()
-        {
-            entities.Clear(); // client lists
-            playerTeam.Clear();
-            enemyTeam.Clear();
-
-            localPlayer.address = swed.ReadPointer(client, offsets.localPlayer); // establece la dirección para que pueda actualizar
-            UpdateEntity(localPlayer);
-
-            UpdateEntities();
-        }
-        void UpdateEntities()
-        {
-            for (int i = 0; i < 64; i++)
-            {
-                IntPtr tempEntityAddress = swed.ReadPointer(client, offsets.entityList + i * 0x08);
-
-                if (tempEntityAddress == IntPtr.Zero)
-                    continue;
-
-                Entity entity = new Entity();
-                entity.address = tempEntityAddress;
-
-                UpdateEntity(entity);
-
-                if (entity.health < 1 || entity.health > 100)
-                    continue;
-
-                if (!entities.Any(element => element.origin.X == entity.origin.X))
-                {
-                    entities.Add(entity);
-
-                    if (entity.teamNum == localPlayer.teamNum)
-                    {
-                        playerTeam.Add(entity);
-                    }
-                    else
-                    {
-                        enemyTeam.Add(entity);
-                    }
-                }
-
-            }
-        }
-
-        void UpdateEntity(Entity entity)
-        {
-            entity.health = swed.ReadInt(entity.address, offsets.health);
-            entity.origin = swed.ReadVec(entity.address, offsets.origin);
-            entity.teamNum = swed.ReadInt(entity.address, offsets.teamNum);
-
-            entity.origin = swed.ReadVec(entity.address, offsets.origin);
-            entity.viewOffset = new Vector3(0, 0, 65);
-
-            entity.abs = Vector3.Add(entity.origin, entity.viewOffset);
-
-            var currentViewMatrix = ReadMatrix(client + offsets.viewmatrix);
-            entity.originScreenPosition = Vector2.Add(WorldToScreen(currentViewMatrix, entity.origin, (int)windowSize.X, (int)windowSize.Y), windowLocation);
-            entity.absScreenPosition = Vector2.Add(WorldToScreen(currentViewMatrix, entity.abs, (int)windowSize.X, (int)windowSize.Y), windowLocation);
-
-          
-        }
-
-        static void Main(string[] args)
-        {
-            Program program = new Program();
-            program.Start().Wait();
-
-            Thread mainLogicThread = new Thread(program.MainLogic) { IsBackground = true };
-            mainLogicThread.Start();
-
-            program.jumpController = new JumpController();
-            program.jumpController.StartJumpControl();
-        }
-
-
-    }
+        renderer.entitiesCopy = entities;
+        renderer.LocalPlayerCopy = localPlayer;
+        Thread.Sleep(3);
 }

@@ -1,61 +1,96 @@
-﻿using BoneEspTutorial;
-using Counter_Strike_2_Multi;
-using Swed64;
+﻿/*
+using ClickableTransparentOverlay;
+using ImGuiNET;
 using System.Numerics;
 
-Swed swed = new Swed("cs2");
-
-IntPtr client = swed.GetModuleBase("client.dll");
-
-Renderer renderer = new Renderer();
-renderer.Start().Wait();
-
-// entity
-List<Entity> entities = new List<Entity>();
-Entity localPlayer = new Entity();
-Vector2 screen = new Vector2(1920, 1080);
-
-renderer.overlaySize = screen;
-
-while (true)
-{   
-    // Eliminar entidades viejas y consola
-    entities.Clear();
-    Console.Clear();
-
-    // obtenemos la lista de entidades
-    IntPtr entityList = swed.ReadPointer(client, Player.dwEntityList);
-
-    // primera entida
-    IntPtr listEntry = swed.ReadPointer(client, 0x10);
-
-    localPlayer.pawnAddress = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
-    localPlayer.team = swed.ReadInt(localPlayer.pawnAddress, Player.m_iTeamNum);
-    localPlayer.origin = swed.ReadVec(localPlayer.pawnAddress, Player.m_vOldOrigin);
-
-    for (int i = 0; i < 64;  i++)
+namespace hackseso
+{
+    public class Renderer : Overlay
     {
-        if (listEntry == IntPtr.Zero)
-            continue;
+        public Vector2 overlaySize = new Vector2(1920, 1080);
+        Vector2 windowLocation = new Vector2(0, 0);
 
-        IntPtr currentController = swed.ReadPointer(listEntry, i * 0x78);
+        public List<Entity> entitiesCopy = new List<Entity>();
 
-        if (currentController == IntPtr.Zero)
-            continue;
+        public Entity LocalPlayerCopy = new Entity();
+        ImDrawListPtr drawList;
 
-        int pawnHandle = swed.ReadInt(currentController, Player.m_hPlayerPawn);
+        public bool esp = true;
+        Vector4 teamColor = new Vector4(1, 1, 1, 1);
+        Vector4 enemyColor = new Vector4(1, 1, 1, 1);
 
-        if (pawnHandle == 0)
-            continue;
+        float boneThickness = 4;
 
-        IntPtr listEntry2 = swed.ReadPointer(entityList, 0x8 * ((pawnHandle & 0x7FFF) >> 9) + 0x10);
+        protected override void Render()
+        {
+            ImGui.Begin("Bone esp");
+            ImGui.Checkbox("esp", ref esp);
+            ImGui.SliderFloat("bone thickness", ref boneThickness, 4, 500);
 
-        IntPtr currenPawn = swed.ReadPointer(listEntry2, 0x78 * (pawnHandle & 0x1FF));
+            if (ImGui.CollapsingHeader("team color"))
+                ImGui.ColorPicker4("##teamcolor", ref teamColor);
 
-        if (currenPawn == localPlayer.pawnAddress)
-            continue;
+            if (ImGui.CollapsingHeader("enemy color"))
+                ImGui.ColorPicker4("##enemycolor", ref enemyColor);
 
-        IntPtr sceneMode = swed.ReadPointer(currenPawn, Player.m_pGameSceneNode);
-        IntPtr boneMatrix = swed.ReadPointer(sceneMode, Player.m_modelState + 0x80);
+            if (esp)
+            {
+                DrawOverlay();
+                DrawSkeletons();
+            }
+            ImGui.End();
+        }
+
+        void DrawSkeletons()
+        {
+            if (entitiesCopy.Count == 0 || entitiesCopy == null)
+                return;
+
+            List<Entity> tempEntities = new List<Entity>(entitiesCopy).ToList();
+
+            drawList = ImGui.GetWindowDrawList();
+            uint uintColor;
+
+            foreach (Entity entity in tempEntities)
+            {
+                if (entity == null) continue;
+                uintColor = LocalPlayerCopy.team == entity.team ? ImGui.ColorConvertFloat4ToU32(teamColor) : ImGui.ColorConvertFloat4ToU32(enemyColor);
+
+                if (entity.bones2d[2].X > 0 && entity.bones2d[2].Y > 0 && entity.bones2d[2].X < overlaySize.X && entity.bones2d[2].Y < overlaySize.Y)
+                {
+                    float currentBoneThickNess = boneThickness / entity.distance;
+
+                    drawList.AddLine(entity.bones2d[1], entity.bones2d[2], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[1], entity.bones2d[3], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[1], entity.bones2d[6], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[3], entity.bones2d[4], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[6], entity.bones2d[7], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[4], entity.bones2d[5], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[7], entity.bones2d[8], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[1], entity.bones2d[0], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[0], entity.bones2d[9], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[0], entity.bones2d[11], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[9], entity.bones2d[10], uintColor, currentBoneThickNess);
+                    drawList.AddLine(entity.bones2d[11], entity.bones2d[12], uintColor, currentBoneThickNess);
+                    drawList.AddCircle(entity.bones2d[2], 3 + currentBoneThickNess, uintColor);
+
+                }
+            }
+        }
+
+        void DrawOverlay()
+        {
+            ImGui.SetNextWindowSize(overlaySize);
+            ImGui.SetNextWindowPos(windowLocation);
+            ImGui.Begin("overlay", ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoBringToFrontOnFocus
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoInputs
+                | ImGuiWindowFlags.NoCollapse
+                | ImGuiWindowFlags.NoScrollbar
+                | ImGuiWindowFlags.NoScrollWithMouse);
+        }
     }
 }
+*/

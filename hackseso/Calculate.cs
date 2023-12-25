@@ -19,11 +19,11 @@ namespace hackseso
                 float camY = height / 2;
 
                 float X = camX + (camX * screenX / screenW);
-                float Y = camY + (camY * screenY / screenW);
+                float Y = camY - (camY * screenY / screenW);
 
                 screenCoordinates.X = X;
                 screenCoordinates.Y = Y;
-
+                return screenCoordinates;
 
             }
             else
