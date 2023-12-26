@@ -30,5 +30,6 @@ namespace hackseso
         public static int m_lifeState = 0x330;
         public static int m_modelState = 0x160;
         public static int m_pGameSceneNode = 0x310;
+        public static int m_flFlashBangTime = 0x145C;
     }
 }
