@@ -1,4 +1,6 @@
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace hackseso
 {
     public class Offsets
@@ -23,6 +25,7 @@ namespace hackseso
         public static int dwLocalPlayerPawn = 0x16C8F38;
         public static int dwEntityList = 0x17C1950;
         public static int dwViewMatrix = 0x1820150;
+        public static int m_iIDEntIndex = 0x1544;
 
         public static int m_hPlayerPawn = 0x7EC;
         public static int m_vOldOrigin = 0x1224;
