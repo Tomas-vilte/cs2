@@ -4,25 +4,32 @@ using System.Runtime.InteropServices;
 
 public class TriggerBot
 {
+    private readonly Swed swed;
+
     [DllImport("user32.dll")]
-    static extern short GetAsyncKeyState(int vKey);
+    private static extern short GetAsyncKeyState(int vKey);
+
+    public TriggerBot()
+    {
+        swed = new Swed("cs2");
+    }
 
     public void Run()
     {
-        Swed swed = new Swed("cs2");
         IntPtr client = swed.GetModuleBase("client.dll");
-        IntPtr forceAttack = client + 0x16C1E70;
+        IntPtr forceAttack = client + 0x16C1F00;
 
-        // trigger
         while (true)
         {
+            Console.Clear();
+
             IntPtr localPlayerPawn = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
-            int entIndex = swed.ReadInt(localPlayerPawn, Player.m_iIDEntIndex);
+            int entIndex = swed.ReadInt(client, Player.m_iIDEntIndex);
             Console.WriteLine($"Crosshair/Entity ID: {entIndex}");
 
             if (GetAsyncKeyState(0x6) < 0)
             {
-                if (entIndex < 0)
+                if (entIndex > 0)
                 {
                     swed.WriteInt(forceAttack, 65537);
                     Thread.Sleep(1);

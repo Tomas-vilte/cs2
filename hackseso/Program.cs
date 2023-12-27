@@ -4,8 +4,11 @@ class Program
 {
     static void Main(string[] args)
     {
-        Aimbot aimbot = new Aimbot();
-        aimbot.RunAimbot();
+        //WallHack wallhack = new WallHack();
+        //wallhack.RunWallhack();
+
+        TriggerBot triggerBot = new TriggerBot();
+        triggerBot.Run();
         
     }
 }

@@ -1,8 +1,7 @@
 ﻿using ImGuiNET;
 using System.Numerics;
-using System.Windows.Input;
 using ClickableTransparentOverlay;
-using Veldrid;
+using System.Runtime.InteropServices;
 
 namespace hackseso
 {
@@ -25,17 +24,11 @@ namespace hackseso
 
         protected override void Render()
         {
-            
-            if (Console.KeyAvailable)
-            {
-              
-                ConsoleKeyInfo key = Console.ReadKey(true);
 
-                
-                if (key.Key == ConsoleKey.F1)
-                {
-                    showOverlay = !showOverlay;
-                }
+
+            if (IsKeyDownX())
+            {
+                esp = !esp;
             }
 
             if (showOverlay)
@@ -58,7 +51,14 @@ namespace hackseso
                 ImGui.End();
             }
         }
+        private bool IsKeyDownX()
+        {
+            const int VK_X = 0x58; 
+            return (GetAsyncKeyState(VK_X) & 0x8001) != 0;
+        }
 
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
 
         void DrawSkeletons()
             {

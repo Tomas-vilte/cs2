@@ -3,20 +3,20 @@ using System.Numerics;
 
 namespace hackseso
 {
-    public class Aimbot
+    public class WallHack
     {
         private readonly Swed swed;
         private readonly Reader reader;
         private readonly Renderer renderer;
 
-        public Aimbot()
+        public WallHack()
         {
             swed = new Swed("cs2");
             reader = new Reader(swed);
             renderer = new Renderer();
         }
 
-        public void RunAimbot()
+        public void RunWallhack()
         {
             renderer.Start().Wait();
 
