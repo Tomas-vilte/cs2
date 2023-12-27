@@ -22,6 +22,7 @@ namespace hackseso
     public static class Player
     {
         // offsests.cs
+        public static int origin = 0xCD8;
         public static int dwLocalPlayerPawn = 0x16C8F38;
         public static int dwEntityList = 0x17C1950;
         public static int dwViewMatrix = 0x1820150;
