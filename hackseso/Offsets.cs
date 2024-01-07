@@ -1,6 +1,4 @@
 
-using System.Security.Cryptography.X509Certificates;
-
 namespace hackseso
 {
     public class Offsets
@@ -35,5 +33,7 @@ namespace hackseso
         public static int m_modelState = 0x160;
         public static int m_pGameSceneNode = 0x310;
         public static int m_flFlashBangTime = 0x145C;
+        public static int m_flDetectedByEnemySensorTime = 0x13E4;
     }
 }
+

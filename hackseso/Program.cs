@@ -1,15 +1,18 @@
-
 using hackseso;
 
 class Program
-{
-    static void Main(string[] args)
+{   
+    static async Task Main(string[] args)
     {
-        TriggerBot triggerBot = new TriggerBot();
-        triggerBot.Run();
-
         //WallHack wallhack = new WallHack();
-        //wallhack.RunWallhack();
-        
+        //TriggerBot triggerBot = new TriggerBot();
+        Glow glow = new Glow();
+        glow.Run();
+
+        //Task wallhackTask = Task.Run(() => wallhack.RunWallhack());
+
+        //triggerBot.Run();
+
+        //await wallhackTask;
     }
 }

@@ -16,28 +16,29 @@ namespace hackseso
             forceAttack = client + 0x16C1E70; // Actualice esta dirección de memoria con la encontrada
         }
 
-        public void Run()
+        public async void Run()
         {
             while (true)
             {
                 Console.Clear();
 
                 IntPtr localPlayerPawn = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
+                Console.WriteLine(localPlayerPawn);
                 int entIndex = swed.ReadInt(localPlayerPawn, Player.m_iIDEntIndex);
-
                 Console.WriteLine($"Crosshair/Entity ID {entIndex}");
 
-                if (GetAsyncKeyState(0x06) < 0) // Cambie la direccion de memoria de la letra que quiera
+                if (GetAsyncKeyState(0x43) < 0) // Cambie la direccion de memoria de la letra que quiera
                 {
                     if (entIndex > 0)
                     {
                         swed.WriteInt(forceAttack, 65537);
-                        Thread.Sleep(1);
+                        //Thread.Sleep(1);
+                        await Task.Delay(1);
                         swed.WriteInt(forceAttack, 256);
                     }
                 }
-
-                Thread.Sleep(1);
+                await Task.Delay(1);
+                //Thread.Sleep(1);
             }
         }
 
