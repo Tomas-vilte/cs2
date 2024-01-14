@@ -6,16 +6,11 @@ class Program
     {
         WallHack wallhack = new WallHack();
         TriggerBot triggerBot = new TriggerBot();
-        //Glow glow = new Glow();
-        //glow.Run();
-
-        //AntiFlash flash = new AntiFlash();
-        
+        AntiFlash flash = new AntiFlash();
 
         Task wallhackTask = Task.Run(() => wallhack.RunWallhack());
-        //flash.RunAntiFlash();
+        flash.RunAntiFlash();
         triggerBot.Run();
-
         await wallhackTask;
     }
 }

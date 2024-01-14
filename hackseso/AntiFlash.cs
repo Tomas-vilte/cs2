@@ -13,7 +13,7 @@ namespace hackseso
             client = swed.GetModuleBase("client.dll");
         }
 
-        public void RunAntiFlash()
+        public async void RunAntiFlash()
         {
             while (true)
             {
@@ -25,7 +25,7 @@ namespace hackseso
                     swed.WriteFloat(localPlayerPawn, Player.m_flFlashBangTime, 0);;
                     Console.WriteLine("No me flasheaste");
                 }
-                Thread.Sleep(2);
+                await Task.Delay(2);
             }
         }
     }

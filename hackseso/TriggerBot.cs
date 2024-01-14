@@ -33,7 +33,6 @@ namespace hackseso
                     IntPtr currentPawn = swed.ReadPointer(listEntry, 0x78 * (entIndex & 0x1FF));
 
                     int entityTeam = swed.ReadInt(currentPawn, Player.m_iTeamNum);
-                    //await Task.Delay(1);
                     if (team != entityTeam)
                     {
                         if (GetAsyncKeyState(0x43) < 0)
