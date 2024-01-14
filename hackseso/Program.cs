@@ -4,15 +4,18 @@ class Program
 {   
     static async Task Main(string[] args)
     {
-        //WallHack wallhack = new WallHack();
+        WallHack wallhack = new WallHack();
         //TriggerBot triggerBot = new TriggerBot();
-        Glow glow = new Glow();
-        glow.Run();
+        //Glow glow = new Glow();
+        //glow.Run();
 
-        //Task wallhackTask = Task.Run(() => wallhack.RunWallhack());
+        //AntiFlash flash = new AntiFlash();
+        
 
+        Task wallhackTask = Task.Run(() => wallhack.RunWallhack());
+        //flash.RunAntiFlash();
         //triggerBot.Run();
 
-        //await wallhackTask;
+        await wallhackTask;
     }
 }

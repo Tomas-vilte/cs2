@@ -24,7 +24,7 @@ namespace hackseso
 
             List<Entity> entities = new List<Entity>();
             Entity localPlayer = new Entity();
-            Vector2 screen = new Vector2(1280, 1024);
+            Vector2 screen = new Vector2(1920, 1080);
 
             renderer.overlaySize = screen;
 
@@ -43,7 +43,7 @@ namespace hackseso
 
                 for (int i = 0; i < 64; i++)
                 {
-                    IntPtr listEntry = swed.ReadPointer(entityList, 0x10);
+                    IntPtr listEntry = swed.ReadPointer(entityList, 0x15);
                     if (listEntry == IntPtr.Zero)
                         continue;
 

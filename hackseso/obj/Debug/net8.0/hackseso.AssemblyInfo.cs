@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("hackseso")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66f06984b21fa68a861bbbdab9dec301d73f204e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a0cffda477579aa1e58cba2ddab7b94e732fda0d")]
 [assembly: System.Reflection.AssemblyProductAttribute("hackseso")]
 [assembly: System.Reflection.AssemblyTitleAttribute("hackseso")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
