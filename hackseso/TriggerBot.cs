@@ -13,32 +13,40 @@ namespace hackseso
         {
             swed = new Swed("cs2");
             client = swed.GetModuleBase("client.dll");
-            forceAttack = client + 0x16C1E70; // Actualice esta dirección de memoria con la encontrada
+            forceAttack = client + 0x16C1E90; // Actualice esta dirección de memoria con la encontrada
         }
 
         public async void Run()
         {
             while (true)
             {
-                Console.Clear();
-
+                IntPtr entityList = swed.ReadPointer(client, Player.dwEntityList);
                 IntPtr localPlayerPawn = swed.ReadPointer(client, Player.dwLocalPlayerPawn);
-                Console.WriteLine(localPlayerPawn);
+
+                int team = swed.ReadInt(localPlayerPawn, Player.m_iTeamNum);
                 int entIndex = swed.ReadInt(localPlayerPawn, Player.m_iIDEntIndex);
                 Console.WriteLine($"Crosshair/Entity ID {entIndex}");
 
-                if (GetAsyncKeyState(0x43) < 0) // Cambie la direccion de memoria de la letra que quiera
+                if (entIndex != -1)
                 {
-                    if (entIndex > 0)
+                    IntPtr listEntry = swed.ReadPointer(entityList, 0x8 * ((entIndex & 0x7FFF) >> 9) + 0x10);
+                    IntPtr currentPawn = swed.ReadPointer(listEntry, 0x78 * (entIndex & 0x1FF));
+
+                    int entityTeam = swed.ReadInt(currentPawn, Player.m_iTeamNum);
+                    //await Task.Delay(1);
+                    if (team != entityTeam)
                     {
-                        swed.WriteInt(forceAttack, 65537);
-                        //Thread.Sleep(1);
-                        await Task.Delay(1);
-                        swed.WriteInt(forceAttack, 256);
+                        if (GetAsyncKeyState(0x43) < 0)
+                        {
+                            swed.WriteInt(forceAttack, 65537);
+                            await Task.Delay(1);
+                            swed.WriteInt(forceAttack, 256);
+                            await Task.Delay(1);
+                        }
                     }
                 }
+               
                 await Task.Delay(1);
-                //Thread.Sleep(1);
             }
         }
 

@@ -43,7 +43,7 @@ namespace hackseso
 
                 for (int i = 0; i < 64; i++)
                 {
-                    IntPtr listEntry = swed.ReadPointer(entityList, 0x15);
+                    IntPtr listEntry = swed.ReadPointer(entityList, 0x10);
                     if (listEntry == IntPtr.Zero)
                         continue;
 
