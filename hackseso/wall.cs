@@ -24,7 +24,7 @@ namespace hackseso
 
             List<Entity> entities = new List<Entity>();
             Entity localPlayer = new Entity();
-            Vector2 screen = new Vector2(1920, 1080);
+            Vector2 screen = new Vector2(1280, 1024);
 
             renderer.overlaySize = screen;
 

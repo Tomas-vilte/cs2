@@ -7,7 +7,7 @@ namespace hackseso
 {
     public class Renderer : Overlay
     {
-        public Vector2 overlaySize = new Vector2(1920, 1080);
+        public Vector2 overlaySize = new Vector2(1280, 1024);
         Vector2 windowLocation = new Vector2(0, 0);
         public List<Entity> entitiesCopy = new List<Entity>();
 
