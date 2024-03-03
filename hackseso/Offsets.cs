@@ -5,7 +5,7 @@ namespace hackseso
     {
 
         // Bases    
-        public int localPlayer = 0x16C8F38;
+        public int localPlayer = 0x1729348;
         public int entityList = 0x17CE6A0;
         public int viewmatrix = 0x1820EA0; //0x1820830
 
@@ -21,14 +21,14 @@ namespace hackseso
     {
         // offsests.cs
         public static int origin = 0xCD8;
-        public static int dwLocalPlayerPawn = 0x16D4F47;
-        public static int dwEntityList = 0x17CE6A0;
-        public static int dwViewMatrix = 0x182CEA0;
-        public static int m_iIDEntIndex = 0x1544;
+        public static int dwLocalPlayerPawn = 0x1729348;
+        public static int dwEntityList = 0x18B3FA8;
+        public static int dwViewMatrix = 0x19154C0;
+        public static int m_iIDEntIndex = 0x15A4;
         
         public static int m_hPlayerPawn = 0x7EC;
         public static int m_vOldOrigin = 0x1224;
-        public static int m_iTeamNum = 0x3BF;
+        public static int m_iTeamNum = 0x3CB;
         public static int m_lifeState = 0x330;
         public static int m_modelState = 0x160;
         public static int m_pGameSceneNode = 0x310;
