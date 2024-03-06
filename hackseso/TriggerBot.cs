@@ -13,7 +13,7 @@ namespace hackseso
         {
             swed = new Swed("cs2");
             client = swed.GetModuleBase("client.dll");
-            forceAttack = client + 0x17221D0; // Actualice esta dirección de memoria con la encontrada
+            forceAttack = client + 0x1728F90; // Actualice esta dirección de memoria con la encontrada
         }
 
         public async void Run()

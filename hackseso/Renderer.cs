@@ -17,9 +17,7 @@ namespace hackseso
         public bool esp = true;
         Vector4 teamColor = new Vector4(1, 1, 1, 1);
         Vector4 enemyColor = new Vector4(1, 1, 1, 1);
-
                     
-        Glow glow = new Glow();
 
         float boneThickness = 4;
         bool showOverlay = true;
@@ -48,7 +46,6 @@ namespace hackseso
                 if (esp)
                 {
                     DrawOverlay();
-                    //glow.Run();
                     DrawSkeletons();
                 }
                 ImGui.End();
